@@ -9,23 +9,52 @@ app.innerHTML = `
 `
 import {Observable} from 'rxjs';
 import { observeNotification } from 'rxjs/internal/Notification';
-const obj = new Observable((observer)=>{
+// const obj = new Observable((observer)=>{
+//   let counter =0;
+// observer.next(10);
+// observer.next(20);
+// observer.error('no');
+// // anche l erro blocca le cose dopo
+// observer.next(40);
+
+// // l inseirme to del complete mi blocca il set inteval
+// observer.complete()
+// setInterval(()=>{
+//   observer.next(Math.random()),2000
+// })
+// })
+// obj.subscribe({
+//   next:(val)=>{console.log('next',val)},
+//   error:(val)=>{console.log('error',val)},
+//   complete:()=>{},
+  
+// })
+const obs = new Observable((observer)=>{
   let counter =0;
 observer.next(10);
 observer.next(20);
-observer.error('no');
-// anche l erro blocca le cose dopo
-observer.next(40);
-
-// l inseirme to del complete mi blocca il set inteval
-observer.complete()
-setInterval(()=>{
-  observer.next(Math.random()),2000
+const id = setInterval(()=>{
+  console.log('timer');
+  if(counter<5){
+    observer.next(Math.random())
+  }else{
+    observer.complete()
+  }
+  counter++;
+},1000)
+return()=>{
+  clearInterval(id)
+}
 })
-})
-obj.subscribe({
-  next:(val)=>{console.log('next',val)},
-  error:(val)=>{console.log('error',val)},
-  complete:()=>{},
+const subscription=obs.subscribe(
+  val=>console.log('next',val),
+  err=>console.log('error',err),
+  ()=>console.log('complete'),
   
-})
+)
+setTimeout(()=>{
+
+  subscription.unsubscribe();
+},3000)
+// unscribe funziona e ferma il numero ma il set interval continua a funzionare, in particolare il console.log timer dato che nessuno glielo dice Possiamo farlo con un if
+// Se avessi 10 observable  posso stopparne solo una con il unsubscribe(). Per questo posso utulizzare un return chje arriva dopo un richiamo del complete
