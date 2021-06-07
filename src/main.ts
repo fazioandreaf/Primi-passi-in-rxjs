@@ -7,7 +7,10 @@ app.innerHTML = `
   <h1>Hello Vite!</h1>
   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
 `
+// operatore di creazione
 import {fromEvent, Observable, of} from 'rxjs';
+// operazione
+import {debounceTime,distinctUntilChanged,map,filter, mergeMap, tap} from 'rxjs/operators';
 import { observeNotification } from 'rxjs/internal/Notification';
 // const obj = new Observable((observer)=>{
 //   let counter =0;
@@ -88,21 +91,38 @@ import { observeNotification } from 'rxjs/internal/Notification';
 //   sub.unsubscribe()
 // ,3000)
 
-// debounc
-let timer;
-let previuousValue;
-const sub=fromEvent(document.getElementById('myInput'),'input')
-  .subscribe((val:KeyboardEvent) => {
+// // debounc
+// let timer;
+// let previuousValue;
+// const sub=fromEvent(document.getElementById('myInput'),'input')
+//   .subscribe((val:KeyboardEvent) => {
 
-    const value=(val.target as HTMLInputElement).value;
-    clearInterval(timer);
-    if(value !==previuousValue){
+//     const value=(val.target as HTMLInputElement).value;
+//     clearInterval(timer);
+//     if(value !==previuousValue){
 
-      if(value.length>3){
-        timer=setTimeout(() => {
-          previuousValue=value;
-          console.log('http',value);
-        }, 1000);
-      }
-    }
-  })
+//       if(value.length>3){
+//         timer=setTimeout(() => {
+//           previuousValue=value;
+//           console.log('http',value);
+//         }, 1000);
+//       }
+//     }
+//   })
+
+// diagramma marble Ogni volta che sottoscrivo l obserable mi ottengo un observer
+fromEvent(document.getElementById('myInput'), 'input')
+.pipe(
+  // prendo  quello che mi arriva
+  map(ev=>(ev.target as HTMLInputElement).value),
+  // lo filtro con una condzione, e map mi ritorna un text
+  filter(text=>text.length>3),
+  //  mi fa il debounce di prima e
+  debounceTime(1000),
+  // elimina le rindondance
+  distinctUntilChanged()
+  // installando mergemap si potrebbe prendere il risultato da un api e ottenre dirattamente la temperatura
+  // mergeMap(text=>ajax.get(`${METEO}?=${text}$units=metric&APPID=${TOKEN}`)),
+  // usando switchMap fa si che distruggono le altre sottoscrizioni se vengono mandati altri query
+)
+.subscribe(text=>console.log(text))
