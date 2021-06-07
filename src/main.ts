@@ -7,7 +7,7 @@ app.innerHTML = `
   <h1>Hello Vite!</h1>
   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
 `
-import {Observable} from 'rxjs';
+import {fromEvent, Observable} from 'rxjs';
 import { observeNotification } from 'rxjs/internal/Notification';
 // const obj = new Observable((observer)=>{
 //   let counter =0;
@@ -29,32 +29,52 @@ import { observeNotification } from 'rxjs/internal/Notification';
 //   complete:()=>{},
   
 // })
-const obs = new Observable((observer)=>{
-  let counter =0;
-observer.next(10);
-observer.next(20);
-const id = setInterval(()=>{
-  console.log('timer');
-  if(counter<5){
-    observer.next(Math.random())
-  }else{
-    observer.complete()
-  }
-  counter++;
-},1000)
-return()=>{
-  clearInterval(id)
-}
-})
-const subscription=obs.subscribe(
-  val=>console.log('next',val),
-  err=>console.log('error',err),
-  ()=>console.log('complete'),
+// const obs = new Observable((observer)=>{
+//   let counter =0;
+// observer.next(10);
+// observer.next(20);
+// const id = setInterval(()=>{
+//   console.log('timer');
+//   if(counter<5){
+//     observer.next(Math.random())
+//   }else{
+//     observer.complete()
+//   }
+//   counter++;
+// },1000)
+// return()=>{
+//   clearInterval(id)
+// }
+// })
+// const subscription=obs.subscribe(
+//   val=>console.log('next',val),
+//   err=>console.log('error',err),
+//   ()=>console.log('complete'),
   
-)
-setTimeout(()=>{
+// )
+// setTimeout(()=>{
 
-  subscription.unsubscribe();
-},3000)
-// unscribe funziona e ferma il numero ma il set interval continua a funzionare, in particolare il console.log timer dato che nessuno glielo dice Possiamo farlo con un if
-// Se avessi 10 observable  posso stopparne solo una con il unsubscribe(). Per questo posso utulizzare un return chje arriva dopo un richiamo del complete
+//   subscription.unsubscribe();
+// },3000)
+// // unscribe funziona e ferma il numero ma il set interval continua a funzionare, in particolare il console.log timer dato che nessuno glielo dice Possiamo farlo con un if
+// // Se avessi 10 observable  posso stopparne solo una con il unsubscribe(). Per questo posso utulizzare un return chje arriva dopo un richiamo del complete
+
+// Versione js
+// document.getElementById('myInput')
+//   .addEventListener('input',
+//   function(event:KeyboardEvent){
+//     console.log((event.target as HTMLInputElement.)value)
+//   })
+
+// operatore di creazione 
+function fromEvent(el:HTMLElement,eventType:string){
+  return new Observable(observer=>{
+    el.addEventListener(eventType, function(event:KeyboardEvent) {
+      observer.next(event)
+    })
+  })
+}
+fromEvent(document.getElementById('myInput'),'input')
+  .subscribe((val:KeyboardEvent) => {
+    console.log((val.target as HTMLInputElement).value)
+  })
