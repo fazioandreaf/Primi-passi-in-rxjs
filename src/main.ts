@@ -90,14 +90,19 @@ import { observeNotification } from 'rxjs/internal/Notification';
 
 // debounc
 let timer;
+let previuousValue;
 const sub=fromEvent(document.getElementById('myInput'),'input')
   .subscribe((val:KeyboardEvent) => {
 
     const value=(val.target as HTMLInputElement).value;
     clearInterval(timer);
-    if(value.length>3){
-      timer=setTimeout(() => {
-        console.log('http',value);
-      }, 1000);
+    if(value !==previuousValue){
+
+      if(value.length>3){
+        timer=setTimeout(() => {
+          previuousValue=value;
+          console.log('http',value);
+        }, 1000);
+      }
     }
   })
