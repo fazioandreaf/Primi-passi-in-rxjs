@@ -68,13 +68,22 @@ import { observeNotification } from 'rxjs/internal/Notification';
 
 // operatore di creazione 
 function fromEvent(el:HTMLElement,eventType:string){
-  return new Observable(observer=>{
-    el.addEventListener(eventType, function(event:KeyboardEvent) {
+   return new Observable(observer=>{
+     const fn=function(event:KeyboardEvent) {
+       console.log('event!!')
       observer.next(event)
-    })
+    };
+    el.addEventListener(eventType, fn)
+    return ()=>
+      el.removeEventListener(eventType,fn)
+    
   })
 }
-fromEvent(document.getElementById('myInput'),'input')
+const sub=fromEvent(document.getElementById('myInput'),'input')
   .subscribe((val:KeyboardEvent) => {
     console.log((val.target as HTMLInputElement).value)
   })
+// questo mi blocca il passaggio del valore
+setTimeout(()=>
+  sub.unsubscribe()
+,3000)
