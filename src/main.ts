@@ -7,7 +7,7 @@ app.innerHTML = `
   <h1>Hello Vite!</h1>
   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
 `
-import {fromEvent, Observable} from 'rxjs';
+import {fromEvent, Observable, of} from 'rxjs';
 import { observeNotification } from 'rxjs/internal/Notification';
 // const obj = new Observable((observer)=>{
 //   let counter =0;
@@ -67,23 +67,37 @@ import { observeNotification } from 'rxjs/internal/Notification';
 //   })
 
 // operatore di creazione 
-function fromEvent(el:HTMLElement,eventType:string){
-   return new Observable(observer=>{
-     const fn=function(event:KeyboardEvent) {
-       console.log('event!!')
-      observer.next(event)
-    };
-    el.addEventListener(eventType, fn)
-    return ()=>
-      el.removeEventListener(eventType,fn)
+// function fromEvent(el:HTMLElement,eventType:string){
+//    return new Observable(observer=>{
+//      const fn=function(event:KeyboardEvent) {
+//        console.log('event!!')
+//       observer.next(event)
+//     };
+//     el.addEventListener(eventType, fn)
+//     return ()=>
+//       el.removeEventListener(eventType,fn)
     
-  })
-}
+//   })
+// }
+// const sub=fromEvent(document.getElementById('myInput'),'input')
+//   .subscribe((val:KeyboardEvent) => {
+//     console.log((val.target as HTMLInputElement).value)
+//   })
+// // questo mi blocca il passaggio del valore
+// setTimeout(()=>
+//   sub.unsubscribe()
+// ,3000)
+
+// debounc
+let timer;
 const sub=fromEvent(document.getElementById('myInput'),'input')
   .subscribe((val:KeyboardEvent) => {
-    console.log((val.target as HTMLInputElement).value)
+
+    const value=(val.target as HTMLInputElement).value;
+    clearInterval(timer);
+    if(value.length>3){
+      timer=setTimeout(() => {
+        console.log('http',value);
+      }, 1000);
+    }
   })
-// questo mi blocca il passaggio del valore
-setTimeout(()=>
-  sub.unsubscribe()
-,3000)
